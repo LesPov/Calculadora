@@ -425,23 +425,13 @@ function processCalculationExpression(expression) {
 
     console.log('Expresión original:', expression);
 
-    // Verificar si la expresión incluye "dividir"
-    if (expression.includes("dividir")) {
-        // Reemplaza "dividir" con la barra inclinada "/"
-        expression = expression.replace("dividir", "/");
+    // Procesar otras operaciones y números sin la lógica relacionada con "dividir"
+    const convertedTranscript = convertKeywordsToOperators(expression);
+    inputField.value += ` ${convertedTranscript}`;
 
-        // Mostrar el posible resultado y reiniciar el temporizador
-        showPossibleResult(eval(expression));
-        resetAutoCalculateTimer();
-    } else {
-        // Procesar otras operaciones y números
-        const convertedTranscript = convertKeywordsToOperators(expression);
-        inputField.value += ` ${convertedTranscript}`;
-
-        // Mostrar el posible resultado y reiniciar el temporizador
-        showPossibleResult(eval(inputField.value));
-        resetAutoCalculateTimer();
-    }
+    // Mostrar el posible resultado y reiniciar el temporizador
+    showPossibleResult(eval(inputField.value));
+    resetAutoCalculateTimer();
 
     console.log('Expresión convertida:', inputField.value);
 
@@ -449,6 +439,7 @@ function processCalculationExpression(expression) {
         lastResult = eval(inputField.value);
     }
 }
+
 
 
 
