@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap');
+
+
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    background-color: #f2f2f2;
+}
+
+#app8g {
+    background-color: #262626;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    height: 100%;
+
+}
+
+#app8g form {
+    background-color: transparent;
+    width: 100%;
+}
+
+#app8g input[type=text] {
+    width: 94%;
+    height: 30px;
+    cursor: default;
+    font-family: 'Roboto', sans-serif;
+    background-color: #262626;
+    color: white;
+    padding: 10px;
+    text-align: right;
+    font-size: 36px;
+    border: 0;
+    outline: none;
+    padding-top: 0px;
+
+}
+
+#app8g input[type=text].error {
+    color: white;
+}
+
+
+#calculation-history {
+    background-color: #262626;
+    color: #ffffff52;
+    padding: 10px;
+    text-align: right;
+    font-size: 20px;
+    height: 275px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+#app8g input[type=button] {
+    width: 22.4%;
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px;
+    margin: 3px;
+    border: 0;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#app8g .number-button {
+    background-color: #262626;
+    color: white;
+    width: 22%;
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px;
+    margin: 3px;
+    border: 0;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#app8g .operation-button {
+    background-color: #262626;
+    color: #e06112;
+    width: 22.4%;
+    font-family: 'Roboto', sans-serif;
+    font-size: 30px;
+    padding: 21px;
+    margin: 3px;
+    border: 0;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+#app8g .operation-buttonecuals {
+    background-color: #e06112;
+    color: white;
+    width: 22.4%;
+    font-family: 'Roboto', sans-serif;
+    font-weight: bold;
+    padding: 21px;
+    margin: 3px;
+    border: 0;
+    border-radius: 50px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.buttons {
+    box-shadow: rgb(245 247 247 / 75%) 0px -2px 0px -1px;
+}
+
+#app8g .number-button {
+    background-color: #262626;
+}
+
+#calculation-history::-webkit-scrollbar {
+    width: 5px;
+}
+
+#calculation-history::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+#calculation-history::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 50px;
+
+}
+
+.calculation-entry {
+    margin-bottom: 15px;
+    line-height: 1.4;
+}
+
+#result-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    height: 30px;
+    /* Altura fija para el resultado posible */
+    padding: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 25px;
+    color: rgba(255, 255, 255, 0.499);
+    padding-top: 0px;
+}
+
+#possible-result {
+    display: none;
+    /* Oculta inicialmente el posible resultado */
+}
