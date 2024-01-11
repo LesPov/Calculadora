@@ -20,7 +20,7 @@ let cleanedTranscript = '';
 let lastResult = null;
 let isRecognitionActive = false;
 let autoCalculateTimer = null;
-let lastResultUsed = false; // Variable para rastrear si se ha utilizado el resultado anterior
+
 function updateHistory() {
     historyElement.innerHTML = calculationHistory
         .map(item => {
@@ -149,11 +149,8 @@ function handleFunctionButton() {
 
 function handleNumberAndOperators() {
     if (resultShown && isNaN(this.value)) {
-        if (!lastResultUsed) {
-            inputField.value = lastResult + this.value;
-            resultShown = false;
-            lastResultUsed = true;
-        }
+        inputField.value = lastResult + this.value;
+        resultShown = false;
     } else {
         handleInputFieldUpdate(this.value);
     }
@@ -166,7 +163,6 @@ function handleNumberAndOperators() {
         // Manejo de errores si es necesario
     }
 }
-
 
 function handleInputFieldUpdate(value) {
     if (value.match(/[\+\-\*\/]/)) {
@@ -247,9 +243,8 @@ function handleNormalBackspace() {
 }
 
 function handlePossibleResult(expression) {
-    const fullExpression = lastResultUsed ? lastResult + expression : expression;
     try {
-        const possibleResult = eval(fullExpression);
+        const possibleResult = eval(expression);
         showPossibleResult(possibleResult);
     } catch (error) {
         hidePossibleResult();
@@ -353,19 +348,13 @@ function isCommandToClear(transcript) {
 }
 
 function handleCalculationInput(transcript) {
-    if (lastResult !== null) {
-        if (/^\d/.test(transcript)) {
-            lastResultUsed = false;
-        } else {
-            transcript = lastResult + transcript;
-            lastResultUsed = true;
-        }
+    if (isCalculationQuestion(transcript)) {
+        const expressionWithoutQuestion = removeCalculationQuestion(transcript);
+        processCalculationExpression(expressionWithoutQuestion);
+    } else {
+        processCalculationExpression(transcript);
     }
-
-    processCalculationExpression(transcript);
 }
-
-
 
 function isCalculationQuestion(transcript) {
     return transcript.includes("cuánto es") || transcript.includes("cuanto es");
@@ -382,7 +371,6 @@ function updateLastResult() {
 }
 
 
-// Función para cambiar el diseño del botón del micrófono
 // Función para cambiar el diseño del botón del micrófono
 function toggleVoiceButtonDesign(active) {
     if (active) {
@@ -426,44 +414,42 @@ function clearResult() {
     lastResult = null; // Reiniciar el último resultado
 }
 
-
 function processCalculationExpression(expression) {
-    if (lastResult !== null && !lastResultUsed) {
+    // Verificar si hay un resultado anterior y limpiar el campo de entrada y ocultar el resultado posible
+    if (lastResult !== null) {
         clearInputAndResult();
-        lastResultUsed = true;
-    } else {
-        lastResultUsed = false;
     }
 
-    expression = cleanExpression(expression);
-    evaluateExpression(expression);
-}
-
-function cleanExpression(expression) {
+    // Eliminar espacios alrededor de los operadores en la expresión dictada
     expression = expression.replace(/ ([+\-*\/]) /g, "$1");
+
     console.log('Expresión original:', expression);
 
-    const convertedTranscript = convertKeywordsToOperators(expression);
-    const newExpression = lastResultUsed ? `${lastResult} ${convertedTranscript}` : convertedTranscript;
+    // Verificar si la expresión incluye "dividir"
+    if (expression.includes("dividir")) {
+        // Reemplaza "dividir" con la barra inclinada "/"
+        expression = expression.replace("dividir", "/");
 
-    console.log('Nueva expresión:', newExpression);
+        // Mostrar el posible resultado y reiniciar el temporizador
+        showPossibleResult(eval(expression));
+        resetAutoCalculateTimer();
+    } else {
+        // Procesar otras operaciones y números
+        const convertedTranscript = convertKeywordsToOperators(expression);
+        inputField.value += ` ${convertedTranscript}`;
 
-    inputField.value = newExpression;
-    return newExpression;
-}
-
-function evaluateExpression(expression) {
-    try {
-        const possibleResult = eval(expression);
-        showPossibleResult(possibleResult);
-    } catch (error) {
-        hidePossibleResult();
-        console.error('Error en el cálculo:', error);
-        inputField.value = 'Error en el cálculo.';
+        // Mostrar el posible resultado y reiniciar el temporizador
+        showPossibleResult(eval(inputField.value));
+        resetAutoCalculateTimer();
     }
 
-    resetAutoCalculateTimer();
+    console.log('Expresión convertida:', inputField.value);
+
+    if (!isNaN(lastResult)) {
+        lastResult = eval(inputField.value);
+    }
 }
+
 
 
 
@@ -483,9 +469,9 @@ voiceButton.addEventListener('click', function () {
         voiceButton.style.backgroundColor = '#e06112';
         voiceButton.style.color = 'white';
         cleanedTranscript = ''; // Reiniciar la expresión dictada limpiada
-        lastResultUsed = false; // Permitir el uso del resultado anterior
     }
 });
+
 // Función para calcular el resultado sin proporcionar respuesta en voz
 // Modificación en la función calculateWithoutSpeaking
 function calculateWithoutSpeaking() {
