@@ -268,7 +268,7 @@ function convertKeywordsToOperators(transcript) {
     const keywordToOperator = {
         'por': '*',
         'multiplicado': '*',
-        'menos': '-',
+        'menos': '- ',
         'en': '/',  // Agregar "dividido en" como palabra clave para la división
         'más': '+',
         'uno': '1',
