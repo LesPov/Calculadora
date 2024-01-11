@@ -367,11 +367,13 @@ function handleCalculationInput(transcript) {
         } else {
             transcript = lastResult + transcript;
             lastResultUsed = true;
+            lastResult = eval(inputField.value); // Agregar esta línea
         }
     }
 
     processCalculationExpression(transcript);
 }
+
 
 
 
@@ -525,11 +527,14 @@ function calculateWithoutSpeaking() {
         inputField.value = formatNumber(result);
         resultShown = true;
         hidePossibleResult();
+
+        lastResult = result; // Agregar esta línea para reiniciar lastResult
     } catch (error) {
         console.error('Error en el cálculo:', error);
         inputField.value = 'Error en el cálculo.';
     }
 }
+
 
 
 // Función para calcular el resultado y proporcionar respuesta en voz
@@ -572,13 +577,15 @@ equalsButton.addEventListener('click', function () {
             lastResult = result;
         }
 
-        const formattedResult = formatNumber(result); // Formatear el resultado
+        const formattedResult = formatNumber(result);
         const calculation = `${expression} = ${formattedResult}`;
         calculationHistory.push(calculation);
         updateHistory();
-        inputField.value = formattedResult; // Formatear el resultado
+        inputField.value = formattedResult;
         resultShown = true;
         hidePossibleResult();
-        cleanedTranscript = '';
+
+        lastResult = result; // Agregar esta línea
+        cleanedTranscript = ''; // Reiniciar la transcripción limpia
     }
 });
