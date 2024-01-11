@@ -20,7 +20,7 @@ let cleanedTranscript = '';
 let lastResult = null;
 let isRecognitionActive = false;
 let autoCalculateTimer = null;
-
+let lastResultUsed = false; // Variable para rastrear si se ha utilizado el resultado anterior
 function updateHistory() {
     historyElement.innerHTML = calculationHistory
         .map(item => {
@@ -149,8 +149,11 @@ function handleFunctionButton() {
 
 function handleNumberAndOperators() {
     if (resultShown && isNaN(this.value)) {
-        inputField.value = lastResult + this.value;
-        resultShown = false;
+        if (!lastResultUsed) {
+            inputField.value = lastResult + this.value;
+            resultShown = false;
+            lastResultUsed = true;
+        }
     } else {
         handleInputFieldUpdate(this.value);
     }
@@ -163,6 +166,7 @@ function handleNumberAndOperators() {
         // Manejo de errores si es necesario
     }
 }
+
 
 function handleInputFieldUpdate(value) {
     if (value.match(/[\+\-\*\/]/)) {
@@ -243,8 +247,9 @@ function handleNormalBackspace() {
 }
 
 function handlePossibleResult(expression) {
+    const fullExpression = lastResultUsed ? lastResult + expression : expression;
     try {
-        const possibleResult = eval(expression);
+        const possibleResult = eval(fullExpression);
         showPossibleResult(possibleResult);
     } catch (error) {
         hidePossibleResult();
@@ -348,13 +353,19 @@ function isCommandToClear(transcript) {
 }
 
 function handleCalculationInput(transcript) {
-    if (isCalculationQuestion(transcript)) {
-        const expressionWithoutQuestion = removeCalculationQuestion(transcript);
-        processCalculationExpression(expressionWithoutQuestion);
-    } else {
-        processCalculationExpression(transcript);
+    if (lastResult !== null) {
+        if (/^\d/.test(transcript)) {
+            lastResultUsed = false;
+        } else {
+            transcript = lastResult + transcript;
+            lastResultUsed = true;
+        }
     }
+
+    processCalculationExpression(transcript);
 }
+
+
 
 function isCalculationQuestion(transcript) {
     return transcript.includes("cuánto es") || transcript.includes("cuanto es");
@@ -371,6 +382,7 @@ function updateLastResult() {
 }
 
 
+// Función para cambiar el diseño del botón del micrófono
 // Función para cambiar el diseño del botón del micrófono
 function toggleVoiceButtonDesign(active) {
     if (active) {
@@ -414,10 +426,13 @@ function clearResult() {
     lastResult = null; // Reiniciar el último resultado
 }
 
+
 function processCalculationExpression(expression) {
-    // Verificar si hay un resultado anterior y limpiar el campo de entrada y ocultar el resultado posible
-    if (lastResult !== null) {
+    if (lastResult !== null && !lastResultUsed) {
         clearInputAndResult();
+        lastResultUsed = true;
+    } else {
+        lastResultUsed = false;
     }
 
     // Eliminar espacios alrededor de los operadores en la expresión dictada
@@ -425,22 +440,24 @@ function processCalculationExpression(expression) {
 
     console.log('Expresión original:', expression);
 
-    // Procesar otras operaciones y números sin la lógica relacionada con "dividir"
     const convertedTranscript = convertKeywordsToOperators(expression);
-    inputField.value += ` ${convertedTranscript}`;
+    const newExpression = lastResultUsed ? `${lastResult} ${convertedTranscript}` : convertedTranscript;
 
-    // Mostrar el posible resultado y reiniciar el temporizador
-    showPossibleResult(eval(inputField.value));
-    resetAutoCalculateTimer();
+    console.log('Nueva expresión:', newExpression);
 
-    console.log('Expresión convertida:', inputField.value);
-
-    if (!isNaN(lastResult)) {
-        lastResult = eval(inputField.value);
+    inputField.value = newExpression;
+    
+    try {
+        const possibleResult = eval(newExpression);
+        showPossibleResult(possibleResult);
+    } catch (error) {
+        hidePossibleResult();
+        console.error('Error en el cálculo:', error);
+        inputField.value = 'Error en el cálculo.';
     }
+
+    resetAutoCalculateTimer();
 }
-
-
 
 
 
@@ -460,9 +477,9 @@ voiceButton.addEventListener('click', function () {
         voiceButton.style.backgroundColor = '#e06112';
         voiceButton.style.color = 'white';
         cleanedTranscript = ''; // Reiniciar la expresión dictada limpiada
+        lastResultUsed = false; // Permitir el uso del resultado anterior
     }
 });
-
 // Función para calcular el resultado sin proporcionar respuesta en voz
 // Modificación en la función calculateWithoutSpeaking
 function calculateWithoutSpeaking() {
