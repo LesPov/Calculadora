@@ -149,7 +149,11 @@ function handleFunctionButton() {
 
 function handleNumberAndOperators() {
     if (resultShown && isNaN(this.value)) {
-        handleResultNotUsed();
+        if (!lastResultUsed) {
+            inputField.value = lastResult + this.value;
+            resultShown = false;
+            lastResultUsed = true;
+        }
     } else {
         handleInputFieldUpdate(this.value);
     }
@@ -160,14 +164,6 @@ function handleNumberAndOperators() {
         showPossibleResult(possibleResult);
     } catch (error) {
         // Manejo de errores si es necesario
-    }
-}
-
-function handleResultNotUsed() {
-    if (!lastResultUsed) {
-        inputField.value = lastResult + this.value;
-        resultShown = false;
-        lastResultUsed = true;
     }
 }
 
@@ -268,7 +264,7 @@ function convertKeywordsToOperators(transcript) {
     const keywordToOperator = {
         'por': '*',
         'multiplicado': '*',
-        'menos': '- ',
+        'menos': '-',
         'en': '/',  // Agregar "dividido en" como palabra clave para la división
         'más': '+',
         'uno': '1',
@@ -337,13 +333,10 @@ function performOperationWithLastResult(operation) {
     }
 }
 
-
-recognition.onresult = function (event) {
+   
+recognition.onresult = function (event) { 
     const transcript = event.results[0][0].transcript.toLowerCase();
     cleanedTranscript = transcript.trim();
-
-    // Mostrar mensaje emergente con la transcripción reconocida
-    alert('Transcripción reconocida: ' + cleanedTranscript);
 
     if (isCommandToClear(cleanedTranscript)) {
         clearResultOrInput();
@@ -354,7 +347,6 @@ recognition.onresult = function (event) {
 
     updateLastResult();
 };
-
 
 function isCommandToClear(transcript) {
     return transcript.includes("borrar");
@@ -367,13 +359,11 @@ function handleCalculationInput(transcript) {
         } else {
             transcript = lastResult + transcript;
             lastResultUsed = true;
-            lastResult = eval(inputField.value); // Agregar esta línea
         }
     }
 
     processCalculationExpression(transcript);
 }
-
 
 
 
@@ -446,24 +436,9 @@ function processCalculationExpression(expression) {
     }
 
     expression = cleanExpression(expression);
-    evaluateExpressionWithKeywords(expression);
+    evaluateExpression(expression);
 }
-function evaluateExpressionWithKeywords(expression) {
-    try {
-        const possibleResult = eval(expression);
 
-        // Cambia la lógica según sea necesario para el formato de resultado esperado
-        // ...
-
-        showPossibleResult(possibleResult);
-    } catch (error) {
-        hidePossibleResult();
-        console.error('Error en el cálculo:', error);
-        inputField.value = 'Error en el cálculo.';
-    }
-
-    resetAutoCalculateTimer();
-}
 function cleanExpression(expression) {
     expression = expression.replace(/ ([+\-*\/]) /g, "$1");
     console.log('Expresión original:', expression);
@@ -527,14 +502,11 @@ function calculateWithoutSpeaking() {
         inputField.value = formatNumber(result);
         resultShown = true;
         hidePossibleResult();
-
-        lastResult = result; // Agregar esta línea para reiniciar lastResult
     } catch (error) {
         console.error('Error en el cálculo:', error);
         inputField.value = 'Error en el cálculo.';
     }
 }
-
 
 
 // Función para calcular el resultado y proporcionar respuesta en voz
@@ -577,15 +549,13 @@ equalsButton.addEventListener('click', function () {
             lastResult = result;
         }
 
-        const formattedResult = formatNumber(result);
+        const formattedResult = formatNumber(result); // Formatear el resultado
         const calculation = `${expression} = ${formattedResult}`;
         calculationHistory.push(calculation);
         updateHistory();
-        inputField.value = formattedResult;
+        inputField.value = formattedResult; // Formatear el resultado
         resultShown = true;
         hidePossibleResult();
-
-        lastResult = result; // Agregar esta línea
-        cleanedTranscript = ''; // Reiniciar la transcripción limpia
+        cleanedTranscript = '';
     }
 });
