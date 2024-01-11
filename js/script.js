@@ -342,6 +342,9 @@ recognition.onresult = function (event) {
     const transcript = event.results[0][0].transcript.toLowerCase();
     cleanedTranscript = transcript.trim();
 
+    // Mostrar mensaje emergente con la transcripción reconocida
+    alert('Transcripción reconocida: ' + cleanedTranscript);
+
     if (isCommandToClear(cleanedTranscript)) {
         clearResultOrInput();
         return;
@@ -351,6 +354,7 @@ recognition.onresult = function (event) {
 
     updateLastResult();
 };
+
 
 function isCommandToClear(transcript) {
     return transcript.includes("borrar");
