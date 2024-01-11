@@ -149,11 +149,7 @@ function handleFunctionButton() {
 
 function handleNumberAndOperators() {
     if (resultShown && isNaN(this.value)) {
-        if (!lastResultUsed) {
-            inputField.value = lastResult + this.value;
-            resultShown = false;
-            lastResultUsed = true;
-        }
+        handleResultNotUsed();
     } else {
         handleInputFieldUpdate(this.value);
     }
@@ -164,6 +160,14 @@ function handleNumberAndOperators() {
         showPossibleResult(possibleResult);
     } catch (error) {
         // Manejo de errores si es necesario
+    }
+}
+
+function handleResultNotUsed() {
+    if (!lastResultUsed) {
+        inputField.value = lastResult + this.value;
+        resultShown = false;
+        lastResultUsed = true;
     }
 }
 
@@ -333,8 +337,8 @@ function performOperationWithLastResult(operation) {
     }
 }
 
-   
-recognition.onresult = function (event) { 
+
+recognition.onresult = function (event) {
     const transcript = event.results[0][0].transcript.toLowerCase();
     cleanedTranscript = transcript.trim();
 
@@ -435,9 +439,12 @@ function processCalculationExpression(expression) {
         lastResultUsed = false;
     }
 
-    // Eliminar espacios alrededor de los operadores en la expresión dictada
-    expression = expression.replace(/ ([+\-*\/]) /g, "$1");
+    expression = cleanExpression(expression);
+    evaluateExpression(expression);
+}
 
+function cleanExpression(expression) {
+    expression = expression.replace(/ ([+\-*\/]) /g, "$1");
     console.log('Expresión original:', expression);
 
     const convertedTranscript = convertKeywordsToOperators(expression);
@@ -446,9 +453,12 @@ function processCalculationExpression(expression) {
     console.log('Nueva expresión:', newExpression);
 
     inputField.value = newExpression;
-    
+    return newExpression;
+}
+
+function evaluateExpression(expression) {
     try {
-        const possibleResult = eval(newExpression);
+        const possibleResult = eval(expression);
         showPossibleResult(possibleResult);
     } catch (error) {
         hidePossibleResult();
