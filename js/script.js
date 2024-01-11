@@ -444,9 +444,24 @@ function processCalculationExpression(expression) {
     }
 
     expression = cleanExpression(expression);
-    evaluateExpression(expression);
+    evaluateExpressionWithKeywords(expression);
 }
+function evaluateExpressionWithKeywords(expression) {
+    try {
+        const possibleResult = eval(expression);
 
+        // Cambia la lógica según sea necesario para el formato de resultado esperado
+        // ...
+
+        showPossibleResult(possibleResult);
+    } catch (error) {
+        hidePossibleResult();
+        console.error('Error en el cálculo:', error);
+        inputField.value = 'Error en el cálculo.';
+    }
+
+    resetAutoCalculateTimer();
+}
 function cleanExpression(expression) {
     expression = expression.replace(/ ([+\-*\/]) /g, "$1");
     console.log('Expresión original:', expression);
